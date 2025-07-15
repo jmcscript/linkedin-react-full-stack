@@ -1,0 +1,11 @@
+{
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+
+    "cSpell.words": [
+        "upvotes"
+    ],
+    
+    "js/ts.implicitProjectConfig.checkJs": true,
+}

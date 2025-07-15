@@ -1,0 +1,13 @@
+{
+    "version": "0.2",
+    "ignorePaths": [
+        "./src/article-content.js"
+    ],
+    "dictionaryDefinitions": [],
+    "dictionaries": [],
+    "words": [
+        "mern"
+    ],
+    "ignoreWords": [],
+    "import": []
+}
