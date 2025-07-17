@@ -1,6 +1,5 @@
 import express from 'express';
-import { MongoClient, ReturnDocument, ServerApiVersion } from 'mongodb';
-
+import { MongoClient, ServerApiVersion } from 'mongodb';
 /**
  * Server config
  */
