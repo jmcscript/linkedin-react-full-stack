@@ -1,24 +1,5 @@
 import express from 'express';
-import { MongoClient, ServerApiVersion } from 'mongodb';
-
-/**
- * @typedef {article[]} articleInfo
- *
- */
-
-/**
- * @typedef {Object} article
- * @property {string} name
- * @property {number} upvotes
- * @property {Object[]} comments
- */
-
-/** @type {articleInfo} */
-const articleInfo = [
-  { name: 'learn-node', upvotes: 0, comments: [] },
-  { name: 'learn-react', upvotes: 0, comments: [] },
-  { name: 'learn-mongodb', upvotes: 0, comments: [] },
-];
+import { MongoClient, ReturnDocument, ServerApiVersion } from 'mongodb';
 
 /**
  * Server config
@@ -30,12 +11,12 @@ const serverPort = process.env.PORT || 8000;
 app.use(express.json());
 
 /**
- * Endpoints
+ * Connect to MongoDB
  */
 
-app.get('/api/articles/:name', async (req, res) => {
-  const { name } = req.params;
+let db;
 
+async function connectToDB() {
   const uri = 'mongodb://127.0.0.1:27017';
   const client = new MongoClient(uri, {
     serverApi: {
@@ -44,48 +25,59 @@ app.get('/api/articles/:name', async (req, res) => {
       deprecationErrors: true,
     },
   });
-
   await client.connect();
+  db = client.db('vite-mern');
+}
 
-  const db = client.db('vite-mern');
+/**
+ * Endpoints
+ */
 
+app.get('/api/articles/:name', async (req, res) => {
+  const { name } = req.params;
   const article = await db.collection('articles').findOne({ name });
 
   res.json(article);
 });
 
-app.post('/api/articles/:name/upvote', (req, res) => {
-  const article = articleInfo.find((a) => a.name === req.params.name) || null;
+app.post('/api/articles/:name/upvote', async (req, res) => {
+  const { name } = req.params;
+  const updatedArticle = await db.collection('articles').findOneAndUpdate(
+    { name },
+    {
+      $inc: { upvotes: 1 },
+    },
+    { returnDocument: 'after' },
+  );
 
-  if (article) {
-    ++article.upvotes;
-    res.json(article);
-  } else {
-    res.send(`Failure, the ${req.params.name} article could not be found.`);
-  }
+  res.json(updatedArticle);
 });
 
-app.post('/api/articles/:name/comments', (req, res) => {
+app.post('/api/articles/:name/comments', async (req, res) => {
   const { name } = req.params;
   const { postedBy, text } = req.body;
+  const newComment = { postedBy, text };
 
-  const article = articleInfo.find((a) => a.name === name) || null;
+  const updatedArticle = await db.collection('articles').findOneAndUpdate(
+    { name },
+    {
+      $push: { comments: newComment },
+    },
+    { returnDocument: 'after' },
+  );
 
-  if (article && 'comments' in article) {
-    article.comments.push({
-      postedBy,
-      text,
-    });
-    res.json(article);
-  } else {
-    res.send(`Failure, the ${name} article could not be found.`);
-  }
+  res.json(updatedArticle);
 });
 
 /**
  * Server launch
  */
 
-app.listen(serverPort, () => {
-  console.log(`Server listening on port ${serverPort}`);
-});
+async function start() {
+  await connectToDB();
+  app.listen(serverPort, () => {
+    console.log(`Server listening on port ${serverPort}`);
+  });
+}
+
+start();
