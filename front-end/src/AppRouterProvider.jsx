@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppLayout from './AppLayout';
 import AboutPage from './pages/AboutPage';
@@ -21,12 +22,17 @@ const appRoutes = [
         element: <AboutPage />,
       },
       {
-        path: '/articles/:name',
-        element: <ArticlePage />,
-      },
-      {
         path: '/articles',
         element: <ArticleListPage />,
+      },
+      {
+        path: '/articles/:name',
+        element: <ArticlePage />,
+        loader: async function () {
+          const response = await axios.get('/api/articles/learn-node');
+          const { upvotes, comments } = response.data;
+          return { upvotes, comments };
+        },
       },
     ],
   },
