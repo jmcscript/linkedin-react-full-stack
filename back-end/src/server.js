@@ -1,4 +1,5 @@
 import express from 'express';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 /**
  * @typedef {article[]} articleInfo
@@ -31,6 +32,27 @@ app.use(express.json());
 /**
  * Endpoints
  */
+
+app.get('/api/articles/:name', async (req, res) => {
+  const { name } = req.params;
+
+  const uri = 'mongodb://127.0.0.1:27017';
+  const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  });
+
+  await client.connect();
+
+  const db = client.db('vite-mern');
+
+  const article = await db.collection('articles').findOne({ name });
+
+  res.json(article);
+});
 
 app.post('/api/articles/:name/upvote', (req, res) => {
   const article = articleInfo.find((a) => a.name === req.params.name) || null;
