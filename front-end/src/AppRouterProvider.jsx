@@ -29,8 +29,10 @@ const appRoutes = [
         path: '/articles/:name',
         element: <ArticlePage />,
         loader: async function () {
-          const response = await axios.get('/api/articles/learn-node');
+          const response = await axios.get('/api/articles/learn-react');
           const { upvotes, comments } = response.data;
+          console.log(upvotes);
+
           return { upvotes, comments };
         },
       },
