@@ -1,9 +1,8 @@
-import axios from 'axios';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppLayout from './AppLayout';
 import AboutPage from './pages/AboutPage';
 import ArticleListPage from './pages/ArticleListPage';
-import ArticlePage from './pages/ArticlePage';
+import ArticlePage, { loader as articleLoader } from './pages/ArticlePage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -28,13 +27,7 @@ const appRoutes = [
       {
         path: '/articles/:name',
         element: <ArticlePage />,
-        loader: async function () {
-          const response = await axios.get('/api/articles/learn-react');
-          const { upvotes, comments } = response.data;
-          console.log(upvotes);
-
-          return { upvotes, comments };
-        },
+        loader: articleLoader,
       },
     ],
   },
