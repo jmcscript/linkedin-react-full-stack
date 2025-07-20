@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppLayout from './AppLayout';
 import AboutPage from './pages/AboutPage';
 import ArticleListPage from './pages/ArticleListPage';
-import ArticlePage, { loader as articleLoader } from './pages/ArticlePage';
+import ArticlePage from './pages/ArticlePage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -27,7 +27,7 @@ const appRoutes = [
       {
         path: '/articles/:name',
         element: <ArticlePage />,
-        loader: articleLoader,
+        loader: ArticlePage.loader,
       },
     ],
   },
