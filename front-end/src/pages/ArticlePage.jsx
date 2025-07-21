@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import axios from 'axios';
 import { useLoaderData, useParams } from 'react-router-dom';
 import CommentList from '../CommentList';
@@ -5,15 +6,23 @@ import articles from '../article-content';
 
 function ArticlePage() {
   const { name } = useParams();
-  const { upvotes, comments } = useLoaderData();
+  const { upvotes: initialUpvotes, comments } = useLoaderData();
+  const [upvotes, setUpvotes] = useState(initialUpvotes);
+  // const [comments, setComments] = useState(initialComments);
 
   const article = articles.find((entry) => entry.name === name);
+
+  async function onUpvoteClick() {
+    const response = await axios.post(`/api/articles/${name}/upvote`);
+    const { upvotes } = response.data;
+    setUpvotes(upvotes);
+  }
 
   if (article) {
     return (
       <>
         <h1>{article.title}</h1>
-        <p>This article has {upvotes} upvotes.</p>
+        <button onClick={onUpvoteClick}>Upvote ({upvotes})</button>
         {article.content.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
