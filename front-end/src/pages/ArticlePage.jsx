@@ -1,7 +1,7 @@
-import { useParams, useLoaderData } from 'react-router-dom';
+import axios from 'axios';
+import { useLoaderData, useParams } from 'react-router-dom';
 import CommentList from '../CommentList';
 import articles from '../article-content';
-import axios from 'axios';
 
 function ArticlePage() {
   const { name } = useParams();
