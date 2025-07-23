@@ -3,12 +3,13 @@ import axios from 'axios';
 import { useLoaderData, useParams } from 'react-router-dom';
 import CommentList from '../CommentList';
 import articles from '../article-content';
+import AddCommentForm from '../AddCommentForm';
 
 function ArticlePage() {
   const { name } = useParams();
-  const { upvotes: initialUpvotes, comments } = useLoaderData();
+  const { upvotes: initialUpvotes, comments: initialComments } = useLoaderData();
   const [upvotes, setUpvotes] = useState(initialUpvotes);
-  // const [comments, setComments] = useState(initialComments);
+  const [comments, setComments] = useState(initialComments);
 
   const article = articles.find((entry) => entry.name === name);
 
@@ -16,6 +17,15 @@ function ArticlePage() {
     const response = await axios.post(`/api/articles/${name}/upvote`);
     const { upvotes } = response.data;
     setUpvotes(upvotes);
+  }
+
+  async function onAddComment({ nameText, commentText }) {
+    const response = await axios.post(`/api/articles/${name}/comments`, {
+      postedBy: nameText,
+      text: commentText,
+    });
+    const { comments } = response.data;
+    setComments(comments);
   }
 
   if (article) {
@@ -26,6 +36,7 @@ function ArticlePage() {
         {article.content.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
+        <AddCommentForm onAddComment={onAddComment} />
         <CommentList comments={comments} />
       </>
     );
