@@ -56,6 +56,12 @@ app.post('/api/articles/:name/comments', async (req, res) => {
   const { name } = req.params;
   const { postedBy, text } = req.body;
 
+  if (!(postedBy && typeof postedBy === 'string' && postedBy.length > 0))
+    return res.status(400).json({ message: 'postedBy is required and must not be empty.' });
+
+  if (!(text && typeof text === 'string' && text.length > 0))
+    return res.status(400).json({ message: 'text is required and must not be empty.' });
+
   const updatedArticle = await db.collection('articles').findOneAndUpdate(
     { name },
     {
@@ -64,7 +70,7 @@ app.post('/api/articles/:name/comments', async (req, res) => {
     { returnDocument: 'after' },
   );
 
-  res.json(updatedArticle);
+  res.status(200).json(updatedArticle);
 });
 
 /**
