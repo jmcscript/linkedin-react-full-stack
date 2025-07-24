@@ -1,7 +1,7 @@
 export default function AboutPage() {
   return (
     <>
-      <h1>AboutPage</h1>
+      <h1>About</h1>
       <p>
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Fugit hic velit explicabo expedita
         ea itaque possimus aliquid, perspiciatis eaque incidunt pariatur. Quis blanditiis doloribus

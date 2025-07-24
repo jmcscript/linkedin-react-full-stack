@@ -3,7 +3,9 @@ import AppLayout from './AppLayout';
 import AboutPage from './pages/AboutPage';
 import ArticleListPage from './pages/ArticleListPage';
 import ArticlePage from './pages/ArticlePage';
+import CreateAccountPage from './pages/CreateAccountPage';
 import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const appRoutes = [
@@ -28,6 +30,14 @@ const appRoutes = [
         path: '/articles/:name',
         element: <ArticlePage />,
         loader: ArticlePage.loader,
+      },
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/create-account',
+        element: <CreateAccountPage />,
       },
     ],
   },
