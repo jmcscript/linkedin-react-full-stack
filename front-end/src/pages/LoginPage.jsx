@@ -14,7 +14,8 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(getAuth(), email, password);
       navigate('/articles');
     } catch (e) {
-      setError(e);
+      setError(e.message);
+      return;
     }
   }
 
