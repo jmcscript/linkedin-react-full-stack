@@ -1,9 +1,9 @@
 import { getAuth, signOut } from 'firebase/auth';
 import { Link, useNavigate } from 'react-router-dom';
+import useUser from './hooks/useUser';
 
 export default function AppNavBar() {
-  const isLoggedIn = false;
-  const email = 'v4ri4bl3@gmail.com';
+  const { isLoading, user } = useUser();
 
   const navigate = useNavigate();
 
@@ -20,14 +20,20 @@ export default function AppNavBar() {
           <li>
             <Link to={'/articles'}>Articles</Link>
           </li>
-          {isLoggedIn && <li>Logged in as {email}</li>}
-          <li>
-            {isLoggedIn ? (
-              <button onClick={() => signOut(getAuth())}>Log Out</button>
-            ) : (
-              <button onClick={() => navigate('/login')}>Log In</button>
-            )}
-          </li>
+          {isLoading ? (
+            <li>Loading...</li>
+          ) : (
+            <>
+              {user && <li>Logged in as {user.email}</li>}
+              <li>
+                {user ? (
+                  <button onClick={() => signOut(getAuth())}>Log Out</button>
+                ) : (
+                  <button onClick={() => navigate('/login')}>Log In</button>
+                )}
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </>

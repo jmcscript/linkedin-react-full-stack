@@ -4,8 +4,10 @@ import { useLoaderData, useParams } from 'react-router-dom';
 import CommentList from '../CommentList';
 import articles from '../article-content';
 import AddCommentForm from '../AddCommentForm';
+// import useUser from '../hooks/useUser';
 
 function ArticlePage() {
+  // const { user } = useUser();
   const { name } = useParams();
   const { upvotes: initialUpvotes, comments: initialComments } = useLoaderData();
   const [upvotes, setUpvotes] = useState(initialUpvotes);
