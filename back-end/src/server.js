@@ -1,5 +1,24 @@
 import express from 'express';
+import admin from 'firebase-admin';
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import credentials from '../credentials.json' with { type: 'json' };
+
+/**
+ * Firebase Config
+ */
+
+/**
+ * I decided to import the JSON instead of importing the 'fs' library. Further study explains that it is more common
+ * to store this information in a .env file or ENVIRONMENT VARIABLES. Either way, it seems to work my way.
+ */
+
+// import fs from 'fs';
+// const credentials = JSON.parse(fs.readFileSync('./credentials.json'));
+
+admin.initializeApp({
+  credential: admin.credential.cert(credentials),
+});
+
 /**
  * Server config
  */
