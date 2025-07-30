@@ -1,19 +1,13 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import fs from 'fs';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import credentials from '../credentials.json' with { type: 'json' };
 
 /**
  * Firebase Config
  */
 
-/**
- * I decided to import the JSON instead of importing the 'fs' library. Further study explains that it is more common
- * to store this information in a .env file or ENVIRONMENT VARIABLES. Either way, it seems to work my way.
- */
-
-// import fs from 'fs';
-// const credentials = JSON.parse(fs.readFileSync('./credentials.json'));
+const credentials = JSON.parse(fs.readFileSync('./credentials.json'));
 
 admin.initializeApp({
   credential: admin.credential.cert(credentials),
@@ -51,6 +45,7 @@ async function connectToDB() {
  * Endpoints
  */
 
+// GET -> article
 app.get('/api/articles/:name', async (req, res) => {
   const { name } = req.params;
   const article = await db.collection('articles').findOne({ name });
@@ -58,12 +53,31 @@ app.get('/api/articles/:name', async (req, res) => {
   res.json(article);
 });
 
+// (Middleware) Going forward, process every request type using this method before moving to then next handler.
+app.use(async (req, res, next) => {
+  const { authtoken } = req.headers;
+
+  if (authtoken) {
+    const user = await admin.auth().verifyIdToken(authtoken);
+    req.user = user;
+  } else {
+    // This seems to cause errors in the server
+    // res.sendStatus(400)
+    return res.sendStatus(400);
+  }
+
+  next();
+});
+
+// POST -> upvote for article
 app.post('/api/articles/:name/upvote', async (req, res) => {
   const { name } = req.params;
+  const { uid } = req.user.uid;
+
   const updatedArticle = await db.collection('articles').findOneAndUpdate(
     { name },
     {
-      $inc: { upvotes: 1 },
+      $push: { upvoteIds: uid },
     },
     { returnDocument: 'after' },
   );
@@ -71,6 +85,7 @@ app.post('/api/articles/:name/upvote', async (req, res) => {
   res.json(updatedArticle);
 });
 
+// POST -> comment for article
 app.post('/api/articles/:name/comments', async (req, res) => {
   const { name } = req.params;
   const { postedBy, text } = req.body;
