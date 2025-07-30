@@ -60,29 +60,33 @@ app.use(async (req, res, next) => {
   if (authtoken) {
     const user = await admin.auth().verifyIdToken(authtoken);
     req.user = user;
-  } else {
-    // This seems to cause errors in the server
-    // res.sendStatus(400)
-    return res.sendStatus(400);
+    return next();
   }
 
-  next();
+  return res.sendStatus(400);
 });
 
 // POST -> upvote for article
 app.post('/api/articles/:name/upvote', async (req, res) => {
   const { name } = req.params;
-  const { uid } = req.user.uid;
+  const { uid } = req.user;
+
+  const article = await db.collection('articles').findOne({ name });
+  const upvoteIds = article.upvoteIds || [];
+  const canUpvote = uid && !upvoteIds.includes(uid);
+
+  if (!canUpvote) return res.sendStatus(403);
 
   const updatedArticle = await db.collection('articles').findOneAndUpdate(
     { name },
     {
+      $inc: { upvotes: 1 },
       $push: { upvoteIds: uid },
     },
     { returnDocument: 'after' },
   );
 
-  res.json(updatedArticle);
+  return res.json(updatedArticle);
 });
 
 // POST -> comment for article
@@ -104,7 +108,7 @@ app.post('/api/articles/:name/comments', async (req, res) => {
     { returnDocument: 'after' },
   );
 
-  res.status(200).json(updatedArticle);
+  return res.status(200).json(updatedArticle);
 });
 
 /**

@@ -1,31 +1,41 @@
-import { useState } from 'react';
 import axios from 'axios';
+import { useState } from 'react';
 import { useLoaderData, useParams } from 'react-router-dom';
+import AddCommentForm from '../AddCommentForm';
 import CommentList from '../CommentList';
 import articles from '../article-content';
-import AddCommentForm from '../AddCommentForm';
-// import useUser from '../hooks/useUser';
+import useUser from '../hooks/useUser';
 
 function ArticlePage() {
-  // const { user } = useUser();
   const { name } = useParams();
   const { upvotes: initialUpvotes, comments: initialComments } = useLoaderData();
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [comments, setComments] = useState(initialComments);
 
+  const { user } = useUser();
+
   const article = articles.find((entry) => entry.name === name);
 
-  async function onUpvoteClick() {
-    const response = await axios.post(`/api/articles/${name}/upvote`);
+  async function handleUpvoteClick() {
+    const token = user && (await user.getIdToken());
+    const headers = token ? { authtoken: token } : {};
+    const response = await axios.post(`/api/articles/${name}/upvote`, null, { headers });
     const { upvotes } = response.data;
     setUpvotes(upvotes);
   }
 
-  async function onAddComment({ nameText, commentText }) {
-    const response = await axios.post(`/api/articles/${name}/comments`, {
-      postedBy: nameText,
-      text: commentText,
-    });
+  async function handleAddComment({ nameText, commentText }) {
+    const token = user && (await user.getIdToken());
+    const headers = token ? { authtoken: token } : {};
+
+    const response = await axios.post(
+      `/api/articles/${name}/comments`,
+      {
+        postedBy: nameText,
+        text: commentText,
+      },
+      { headers },
+    );
     const { comments } = response.data;
     setComments(comments);
   }
@@ -34,12 +44,18 @@ function ArticlePage() {
     return (
       <>
         <h1>{article.title}</h1>
-        <button onClick={onUpvoteClick}>Upvote ({upvotes})</button>
+        {user && <button onClick={handleUpvoteClick}>Upvote ({upvotes})</button>}
         {article.content.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
-        <AddCommentForm onAddComment={onAddComment} />
-        <CommentList comments={comments} />
+        {user ? (
+          <AddCommentForm onAddComment={handleAddComment} />
+        ) : (
+          <p>
+            <em>Log in to add a comment</em>
+          </p>
+        )}
+        {comments.length > 0 && <CommentList comments={comments} />}
       </>
     );
   }
