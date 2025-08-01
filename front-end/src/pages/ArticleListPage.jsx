@@ -1,7 +1,11 @@
-import entries from '../article-content';
+import { useLoaderData } from 'react-router-dom';
 import FavoriteArticleList from '../FavoriteArticleList';
 
-export default function ArticleListPage() {
+import axios from 'axios';
+
+function ArticleListPage() {
+  const entries = useLoaderData();
+
   return (
     <>
       <h1>Article List</h1>
@@ -9,3 +13,12 @@ export default function ArticleListPage() {
     </>
   );
 }
+
+async function loader() {
+  const response = await axios.get('/api/articles');
+  return response.data;
+}
+
+ArticleListPage.loader = loader;
+
+export default ArticleListPage;

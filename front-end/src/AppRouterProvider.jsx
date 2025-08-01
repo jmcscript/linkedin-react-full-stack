@@ -25,6 +25,7 @@ const appRoutes = [
       {
         path: '/articles',
         element: <ArticleListPage />,
+        loader: ArticleListPage.loader,
       },
       {
         path: '/articles/:name',

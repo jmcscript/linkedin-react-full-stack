@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
+// Content body contains paragraph tags that must be removed to render correctly.
+const stripHtml = function (str) {
+  const stripRegEx = /<\/?p>/gi;
+  return str.replace(stripRegEx, '');
+};
+
 function FavoriteArticleList({ entries }) {
   return (
     <>
@@ -8,7 +14,7 @@ function FavoriteArticleList({ entries }) {
         <section key={entry.name}>
           <Link to={'/articles/' + entry.name}>
             <h3>{entry.title}</h3>
-            <p>{entry.content[0].substring(0, 100) + '...'}</p>
+            <p>{stripHtml(entry.body).substring(0, 100) + '...'}</p>
           </Link>
         </section>
       ))}
@@ -21,7 +27,7 @@ FavoriteArticleList.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-      content: PropTypes.arrayOf(PropTypes.string).isRequired,
+      body: PropTypes.string.isRequired,
     }),
   ).isRequired,
 };

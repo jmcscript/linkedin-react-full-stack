@@ -1,20 +1,17 @@
 import axios from 'axios';
+import parse from 'html-react-parser';
 import { useState } from 'react';
 import { useLoaderData, useParams } from 'react-router-dom';
 import AddCommentForm from '../AddCommentForm';
 import CommentList from '../CommentList';
-import articles from '../article-content';
 import useUser from '../hooks/useUser';
 
 function ArticlePage() {
   const { name } = useParams();
-  const { upvotes: initialUpvotes, comments: initialComments } = useLoaderData();
+  const { title, body, upvotes: initialUpvotes, comments: initialComments } = useLoaderData();
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [comments, setComments] = useState(initialComments);
-
   const { user } = useUser();
-
-  const article = articles.find((entry) => entry.name === name);
 
   async function handleUpvoteClick() {
     const token = user && (await user.getIdToken());
@@ -40,14 +37,12 @@ function ArticlePage() {
     setComments(comments);
   }
 
-  if (article) {
+  if (title && body) {
     return (
       <>
-        <h1>{article.title}</h1>
+        <h1>{title}</h1>
         {user && <button onClick={handleUpvoteClick}>Upvote ({upvotes})</button>}
-        {article.content.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+        {parse(body)}
         {user ? (
           <AddCommentForm onAddComment={handleAddComment} />
         ) : (
@@ -63,8 +58,9 @@ function ArticlePage() {
 
 async function loader({ params }) {
   const response = await axios.get(`/api/articles/${params.name}`);
-  const { upvotes, comments } = response.data;
-  return { upvotes, comments };
+
+  const { title, body, upvotes, comments } = response.data;
+  return { title, body, upvotes, comments };
 }
 
 ArticlePage.loader = loader;
