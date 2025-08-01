@@ -2,6 +2,11 @@ import express from 'express';
 import admin from 'firebase-admin';
 import fs from 'fs';
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Firebase Config
@@ -44,6 +49,13 @@ async function connectToDB() {
 /**
  * Endpoints
  */
+
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// GET -> vite dist files served for requests not starting with '/api'
+app.get(/^(?!\/api).+/, (req, res) => {
+  return res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
 
 // GET -> article collection
 app.get('/api/articles', async (req, res) => {
