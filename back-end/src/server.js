@@ -45,12 +45,27 @@ async function connectToDB() {
  * Endpoints
  */
 
+// GET -> article collection
+app.get('/api/articles', async (req, res) => {
+  try {
+    const articles = [];
+    const cursor = await db.collection('articles').find().project({ name: 1, title: 1, body: 1 });
+    for await (const article of cursor) {
+      articles.push(article);
+    }
+    return res.json(articles);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+});
+
 // GET -> article
 app.get('/api/articles/:name', async (req, res) => {
   const { name } = req.params;
   const article = await db.collection('articles').findOne({ name });
 
-  res.json(article);
+  return res.json(article);
 });
 
 // (Middleware) Going forward, process every request type using this method before moving to then next handler.
