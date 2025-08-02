@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 
 // Content body contains paragraph tags that must be removed to render correctly.
 const stripHtml = function (str) {
+  const replaceRegEx = /<p><\/p>/gi;
   const stripRegEx = /<\/?p>/gi;
-  return str.replace(stripRegEx, '');
+  return str.replace(replaceRegEx, ' ').replace(stripRegEx, '');
 };
 
 function FavoriteArticleList({ entries }) {
