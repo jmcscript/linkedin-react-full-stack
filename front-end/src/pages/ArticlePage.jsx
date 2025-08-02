@@ -17,7 +17,8 @@ function ArticlePage() {
     const token = user && (await user.getIdToken());
     const headers = token ? { authtoken: token } : {};
     const response = await axios.post(`/api/articles/${name}/upvote`, null, { headers });
-    const { upvotes } = response.data;
+    const { upvoteIds } = response.data;
+    const upvotes = upvoteIds.length || 0;
     setUpvotes(upvotes);
   }
 
@@ -59,7 +60,8 @@ function ArticlePage() {
 async function loader({ params }) {
   const response = await axios.get(`/api/articles/${params.name}`);
 
-  const { title, body, upvotes, comments } = response.data;
+  const { title, body, upvoteIds, comments } = response.data;
+  const upvotes = upvoteIds.length || 0;
   return { title, body, upvotes, comments };
 }
 

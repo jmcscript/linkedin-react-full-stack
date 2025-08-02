@@ -107,7 +107,6 @@ app.post('/api/articles/:name/upvote', async (req, res) => {
   const updatedArticle = await db.collection('articles').findOneAndUpdate(
     { name },
     {
-      $inc: { upvotes: 1 },
       $push: { upvoteIds: uid },
     },
     { returnDocument: 'after' },
