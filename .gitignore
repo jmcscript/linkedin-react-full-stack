@@ -1,2 +1,4 @@
+.vscode/**
+
 # Firebase Credentials
 back-end/credentials.json
