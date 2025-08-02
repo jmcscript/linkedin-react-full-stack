@@ -1,4 +1,10 @@
 .vscode/**
 
+# env
+back-end/.env
+
 # Firebase Credentials
 back-end/credentials.json
+
+# Google Cloud
+back-end/prod-env.yaml
